@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>MindCare | Login</title>
+    <link rel="stylesheet" href="auth.css" />
+</head>
+
+<body>
+    <div class="auth-card">
+        <div class="logo">🧠</div>
+
+        <h1>MindCare</h1>
+        <p class="subtitle">Welcome back to your wellness journey</p>
+
+        <label>Email</label>
+        <input id="email" type="email" placeholder="Enter your email" />
+
+        <label>Password</label>
+        <input id="password" type="password" placeholder="Enter your password" />
+
+        <!-- Login uses API -->
+        <button id="signin" type="button">Sign In</button>
+        <div id="error" style="color: #b00020; margin-top: 8px"></div>
+
+        <script>
+            (function() {
+                const emailEl = document.getElementById("email");
+                const passEl = document.getElementById("password");
+                const btn = document.getElementById("signin");
+                const errorEl = document.getElementById("error");
+
+                async function doLogin() {
+                    errorEl.textContent = "";
+                    const email = (emailEl.value || "").trim();
+                    const password = passEl.value || "";
+                    if (!email || !password) {
+                        errorEl.textContent = "Missing email or password.";
+                        return;
+                    }
+                    btn.disabled = true;
+                    try {
+                        const r = await fetch("/api/login", {
+                            method: "POST",
+                            credentials: "same-origin",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                email,
+                                password
+                            }),
+                        });
+                        let j = {};
+                        try {
+                            j = await r.json();
+                        } catch (e) {
+                            /* ignore parse errors */
+                        }
+                        if (r.ok && j.success) {
+                            window.location.href = "/dashboard.html";
+                        } else {
+                            errorEl.textContent = j.error || `Login failed (${r.status})`;
+                        }
+                    } catch (err) {
+                        console.error("Login error", err);
+                        errorEl.textContent =
+                            "Network or server error. See console for details.";
+                    } finally {
+                        btn.disabled = false;
+                    }
+                }
+
+                btn.addEventListener("click", doLogin);
+                // allow Enter key to submit
+                [emailEl, passEl].forEach((el) =>
+                    el.addEventListener("keydown", (e) => {
+                        if (e.key === "Enter") doLogin();
+                    })
+                );
+            })();
+        </script>
+
+        <div class="switch">
+            Need an account? <a href="signup.html">Sign up</a>
+        </div>
+    </div>
+</body>
+
+</html>

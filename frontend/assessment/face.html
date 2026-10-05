@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Facial Analysis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            min-height: 100vh;
+        }
+        
+        .bg {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #e6f6ee, #f7f3de, #f3d9e8, #dcd7f1);
+            z-index: -1;
+        }
+        
+        .page {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+            padding: 40px 20px 80px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .back {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .phase {
+            font-size: 14px;
+            color: #777;
+        }
+        
+        .progress {
+            height: 8px;
+            background: #e5e8ef;
+            border-radius: 99px;
+            overflow: hidden;
+        }
+        
+        .bar {
+            height: 100%;
+            background: linear-gradient(90deg, #a7e6cb, #c7b9f2);
+        }
+        
+        .phase-label {
+            text-align: center;
+            margin: 10px 0 30px;
+            color: #777;
+        }
+        
+        .card {
+            background: #fff;
+            border-radius: 24px;
+            padding: 36px;
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+        
+        .icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        
+        h1 {
+            margin: 10px 0;
+        }
+        
+        .subtitle {
+            color: #777;
+        }
+        
+        .preview {
+            position: relative;
+            margin: 30px 0;
+            height: 300px;
+            border-radius: 16px;
+            background: #edf1f6;
+            overflow: hidden;
+        }
+        
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #777;
+            background: rgba(237, 241, 246, 0.95);
+        }
+        
+        .overlay.analyzing {
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #c7b9f2;
+            border-top: 4px solid #a7e6cb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .instructions {
+            background: #f5f7fb;
+            padding: 16px;
+            border-radius: 16px;
+            text-align: left;
+        }
+        
+        .instructions ul {
+            padding-left: 18px;
+        }
+        
+        .action {
+            margin-top: 20px;
+            width: 100%;
+            padding: 14px;
+            border-radius: 999px;
+            border: none;
+            background: linear-gradient(90deg, #a7e6cb, #c7b9f2);
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .footer-note {
+            margin-top: 30px;
+            text-align: center;
+            font-style: italic;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+        <div class="bg"></div>
+
+        <div class="container">
+            <div class="header">
+                <button class="back" onclick="location.href='../dashboard.html'">
+            ← Back
+          </button>
+                <span class="phase">Phase 1 of 3</span>
+            </div>
+
+            <div class="progress">
+                <div class="bar" style="width: 33%"></div>
+            </div>
+            <p class="phase-label">Facial Expression Analysis</p>
+
+            <div class="card">
+                <div class="icon">📷</div>
+                <h1>Facial Analysis</h1>
+                <p class="subtitle">
+                    We will capture a photo and analyze facial stress indicators.
+                </p>
+
+                <div class="preview">
+                    <video id="video" autoplay playsinline muted></video>
+                    <div class="overlay" id="placeholder">
+                        <p>Camera preview will appear here</p>
+                    </div>
+                    <div class="overlay analyzing hidden" id="analyzing">
+                        <div class="spinner"></div>
+                        <p>Analyzing facial expressions…</p>
+                    </div>
+                </div>
+
+                <div class="instructions">
+                    <h4>Instructions:</h4>
+                    <ul>
+                        <li>Find a well-lit area and position your face in the center</li>
+                        <li>Remain still and look directly at the camera</li>
+                        <li>A photo will be taken</li>
+                        <li>Try to maintain a natural expression</li>
+                    </ul>
+                </div>
+
+                <button id="actionBtn" class="action">📷 Start Camera</button>
+            </div>
+
+            <p class="footer-note">Relax — your privacy is respected.</p>
+        </div>
+    </div>
+
+    <script>
+        // Since the frontend and backend are served from the same origin,
+        // we can use relative paths for API calls. This is simpler and more robust.
+        const API_ENDPOINT = "/predict_face";
+
+        const video = document.getElementById("video");
+        const actionBtn = document.getElementById("actionBtn");
+        const placeholder = document.getElementById("placeholder");
+        const analyzing = document.getElementById("analyzing");
+
+        let stream = null;
+        let cameraReady = false;
+
+        async function startCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: true
+                });
+                video.srcObject = stream;
+                placeholder.classList.add("hidden");
+                cameraReady = true;
+                actionBtn.textContent = "📷 Capture & Analyze";
+            } catch (err) {
+                console.error("Camera access failed:", err);
+                alert(
+                    "Could not access the camera. Please ensure you have a webcam connected and have granted permission in your browser."
+                );
+            }
+        }
+
+        async function analyzeFace() {
+            analyzing.classList.remove("hidden");
+            actionBtn.disabled = true;
+
+            const canvas = document.createElement("canvas");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext("2d").drawImage(video, 0, 0);
+
+            canvas.toBlob(async(blob) => {
+                const formData = new FormData();
+                formData.append("image", blob, "face.jpg");
+
+                try {
+                    const res = await fetch(API_ENDPOINT, {
+                        method: "POST",
+                        body: formData,
+                    });
+
+                    if (!res.ok) {
+                        const payload = await res.json().catch(() => null);
+                        const errorMsg =
+                            payload && payload.error ?
+                            payload.error :
+                            `HTTP Error ${res.status}`;
+                        throw new Error(errorMsg);
+                    }
+
+                    const data = await res.json();
+
+                    sessionStorage.setItem(
+                        "faceResult",
+                        JSON.stringify({
+                            success: true,
+                            emotion: data.emotion,
+                            stressLevel: data.stressLevel ?? data.stress ?? "Not detected",
+                            confidence: data.confidence,
+                        })
+                    );
+
+                    stream.getTracks().forEach((t) => t.stop());
+                    location.href = "voice.html";
+                } catch (err) {
+                    console.error("Facial analysis failed:", err);
+                    alert("Facial analysis failed:\n" + err.message);
+                    analyzing.classList.add("hidden");
+                    actionBtn.disabled = false;
+                }
+            }, "image/jpeg");
+        }
+
+        actionBtn.onclick = async() => {
+            if (!cameraReady) await startCamera();
+            else await analyzeFace();
+        };
+    </script>
+</body>
+
+</html>

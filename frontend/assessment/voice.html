@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Voice Analysis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            min-height: 100vh;
+        }
+        
+        .bg {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #e6f6ee, #f7f3de, #f3d9e8, #dcd7f1);
+            z-index: -1;
+        }
+        
+        .page {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+            padding: 40px 20px 80px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .back {
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .phase {
+            color: #777;
+        }
+        
+        .progress {
+            height: 8px;
+            background: #e5e8ef;
+            border-radius: 99px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .bar {
+            height: 100%;
+            background: linear-gradient(90deg, #f6c6a7, #d6c6f2);
+        }
+        
+        .phase-label {
+            text-align: center;
+            color: #777;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: #fff;
+            border-radius: 24px;
+            padding: 36px;
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+        
+        .icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #777;
+        }
+        
+        .visualizer {
+            margin: 30px 0;
+            height: 260px;
+            border-radius: 16px;
+            background: #edf1f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            position: relative;
+            /* allow absolute overlay for centered analyzing */
+            overflow: hidden;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .countdown {
+            font-size: 56px;
+            font-weight: bold;
+        }
+        
+        .bars {
+            display: flex;
+            gap: 6px;
+            height: 120px;
+            align-items: end;
+        }
+        
+        .bar-voice {
+            width: 8px;
+            height: 30px;
+            background: linear-gradient(180deg, #f6c6a7, #d6c6f2);
+            border-radius: 6px;
+            transition: height 0.12s linear;
+            transform-origin: bottom center;
+        }
+        /* Pitch symbol: centered inside visualizer and styled per level */
+        
+        #pitchSymbol {
+            position: absolute;
+            left: 50%;
+            top: 16px;
+            /* move to top to avoid overlapping countdown */
+            transform: translateX(-50%);
+            z-index: 2;
+            font-size: 26px;
+            transition: transform 0.12s ease, color 0.12s ease, top 0.12s ease;
+        }
+        
+        #pitchSymbol.low {
+            color: #5ac18e;
+            transform: translateX(-50%) scale(0.95);
+        }
+        
+        #pitchSymbol.medium {
+            color: #ffb74d;
+            transform: translateX(-50%) scale(1);
+        }
+        
+        #pitchSymbol.high {
+            color: #ff6b6b;
+            transform: translateX(-50%) scale(1.18);
+        }
+        /* Spinner removed along with the analyzing overlay */
+        
+        .instructions {
+            background: #f5f7fb;
+            padding: 16px;
+            border-radius: 16px;
+            text-align: left;
+        }
+        
+        .instructions ul {
+            padding-left: 18px;
+        }
+        
+        .action {
+            margin-top: 20px;
+            width: 100%;
+            padding: 14px;
+            border-radius: 999px;
+            border: none;
+            background: linear-gradient(90deg, #f6c6a7, #d6c6f2);
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .footer-note {
+            margin-top: 30px;
+            text-align: center;
+            font-style: italic;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+        <div class="bg"></div>
+
+        <div class="container">
+            <div class="header">
+                <button class="back" onclick="location.href='face.html'">
+            ← Back
+          </button>
+                <span class="phase">Phase 2 of 3</span>
+            </div>
+
+            <div class="progress">
+                <div class="bar" style="width: 66%"></div>
+            </div>
+            <p class="phase-label">Voice Pattern Analysis</p>
+
+            <div class="card">
+                <div class="icon">🎤</div>
+                <h1>Voice Analysis</h1>
+                <p class="subtitle">Record 5 seconds of natural speech.</p>
+
+                <div class="visualizer">
+                    <div id="idleState">
+                        <p>Click below to start recording</p>
+                    </div>
+
+                    <div id="recordingState" class="hidden" style="padding-top: 42px">
+                        <div class="countdown" id="countdown">5</div>
+                        <div class="bars" id="bars"></div>
+                        <p>Speak naturally…</p>
+                    </div>
+
+                    <!-- Pitch symbol (outside recording block) -->
+                    <div id="pitchSymbol" class="hidden" aria-hidden="true">🎤</div>
+                </div>
+
+                <div class="instructions">
+                    <h4>Instructions:</h4>
+                    <ul>
+                        <li>Find a quiet environment with minimal background noise</li>
+                        <li>Speak clearly about your day or how you're feeling</li>
+                        <li>Maintain a normal speaking volume and pace</li>
+                        <li>The recording will last 5 seconds</li>
+                    </ul>
+                </div>
+
+                <button id="recordBtn" class="action">🎤 Start Recording</button>
+            </div>
+
+            <p class="footer-note">Your voice reflects your emotional state.</p>
+        </div>
+    </div>
+
+    <script>
+        // Since the frontend and backend are served from the same origin,
+        // we can use a relative path for the API call.
+        const API_ENDPOINT = "/predict_voice";
+
+        const recordBtn = document.getElementById("recordBtn");
+        const idle = document.getElementById("idleState");
+        const recording = document.getElementById("recordingState");
+        const countdownEl = document.getElementById("countdown");
+        const barsContainer = document.getElementById("bars");
+
+        let mediaRecorder;
+        let audioChunks = [];
+
+        for (let i = 0; i < 20; i++) {
+            const bar = document.createElement("div");
+            bar.className = "bar-voice";
+            barsContainer.appendChild(bar);
+        }
+
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: true,
+                });
+
+                idle.classList.add("hidden");
+                recording.classList.remove("hidden");
+                recordBtn.disabled = true;
+                // reset the pitch symbol
+                const ps_init = document.getElementById("pitchSymbol");
+                if (ps_init) {
+                    ps_init.classList.remove("low", "medium", "high");
+                    ps_init.classList.remove("hidden");
+                }
+
+                // Setup audio context and analyser for live visualization / pitch detection
+                const audioContext = new(window.AudioContext ||
+                    window.webkitAudioContext)();
+                const source = audioContext.createMediaStreamSource(stream);
+                const analyserNode = audioContext.createAnalyser();
+                analyserNode.fftSize = 2048;
+                source.connect(analyserNode);
+                const freqData = new Uint8Array(analyserNode.frequencyBinCount);
+                const timeData = new Float32Array(analyserNode.fftSize / 2);
+
+                // Animation loop
+                const bars = Array.from(document.querySelectorAll(".bar-voice"));
+                let animationId = null;
+
+                function detectPitchFromFreqData(freqDataArray, sampleRate, fftSize) {
+                    let maxIdx = 0;
+                    let maxVal = 0;
+                    for (let i = 0; i < freqDataArray.length; i++) {
+                        if (freqDataArray[i] > maxVal) {
+                            maxVal = freqDataArray[i];
+                            maxIdx = i;
+                        }
+                    }
+                    if (maxVal < 8) return -1; // too quiet or no clear peak
+                    const freq = maxIdx * (sampleRate / fftSize);
+                    if (freq < 50 || freq > 2000) return -1;
+                    return Math.round(freq);
+                }
+
+                function pitchLevelFromHz(hz) {
+                    if (hz < 0) return "--";
+                    if (hz < 160) return "Low";
+                    if (hz < 260) return "Medium";
+                    return "High";
+                }
+
+                function updateVisualizer() {
+                    analyserNode.getByteFrequencyData(freqData);
+
+                    // Update bars (map frequency bins to bars)
+                    const binsPerBar = Math.max(
+                        1,
+                        Math.floor(freqData.length / bars.length)
+                    );
+                    for (let i = 0; i < bars.length; i++) {
+                        let sum = 0;
+                        for (let j = 0; j < binsPerBar; j++) {
+                            const idx = i * binsPerBar + j;
+                            sum += freqData[idx] || 0;
+                        }
+                        const avg = sum / binsPerBar;
+                        const height = Math.max(6, Math.round((avg / 255) * 110));
+                        bars[i].style.height = height + "px";
+                    }
+
+                    // Pitch detection from freq data
+                    const detected = detectPitchFromFreqData(
+                        freqData,
+                        audioContext.sampleRate,
+                        analyserNode.fftSize
+                    );
+                    const pitchSymbol = document.getElementById("pitchSymbol");
+                    if (detected > 0) {
+                        const lvl = pitchLevelFromHz(detected);
+                        pitchSymbol.classList.remove("low", "medium", "high");
+                        if (lvl === "Low") pitchSymbol.classList.add("low");
+                        else if (lvl === "Medium") pitchSymbol.classList.add("medium");
+                        else if (lvl === "High") pitchSymbol.classList.add("high");
+                    } else {
+                        pitchSymbol.classList.remove("low", "medium", "high");
+                    }
+
+                    animationId = requestAnimationFrame(updateVisualizer);
+                }
+
+                animationId = requestAnimationFrame(updateVisualizer);
+
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+
+                mediaRecorder.onstop = async() => {
+                    // stop visualization
+                    if (animationId) cancelAnimationFrame(animationId);
+                    try {
+                        source.disconnect();
+                        analyserNode.disconnect();
+                        audioContext.close();
+                    } catch (e) {
+                        // ignore
+                    }
+
+                    // reset bars and pitch symbol immediately
+                    document
+                        .querySelectorAll(".bar-voice")
+                        .forEach((b) => (b.style.height = "30px"));
+                    const ps = document.getElementById("pitchSymbol");
+                    if (ps) {
+                        ps.classList.remove("low", "medium", "high");
+                        ps.classList.add("hidden");
+                    }
+
+                    // Ensure idle/recording are hidden
+                    idle.classList.add("hidden");
+                    recording.classList.add("hidden");
+
+                    const blob = new Blob(audioChunks, {
+                        type: "audio/webm",
+                    });
+                    const formData = new FormData();
+                    formData.append("audio", blob, "voice.webm");
+
+                    try {
+                        const res = await fetch(API_ENDPOINT, {
+                            method: "POST",
+                            body: formData,
+                        });
+
+                        if (!res.ok) {
+                            const payload = await res.json().catch(() => null);
+                            const errorMsg =
+                                payload && payload.error ?
+                                payload.error :
+                                `HTTP Error ${res.status}`;
+                            throw new Error(errorMsg);
+                        }
+
+                        const result = await res.json();
+                        if (!result.success)
+                            throw new Error(result.error || "Prediction failed");
+
+                        // Analyzing overlay removed from UI flow
+
+                        sessionStorage.setItem("voiceResult", JSON.stringify(result));
+                        location.href = "survey.html";
+                    } catch (err) {
+                        console.error("Voice analysis failed:", err);
+                        alert("Voice analysis failed: " + err.message);
+                        // Analyzing overlay removed from UI flow
+                        idle.classList.remove("hidden");
+                        recordBtn.disabled = false;
+                        const ps_err = document.getElementById("pitchSymbol");
+                        if (ps_err) ps_err.classList.remove("low", "medium", "high");
+                    }
+                };
+
+                mediaRecorder.start();
+
+                let count = 5;
+                countdownEl.textContent = count;
+                const interval = setInterval(() => {
+                    count--;
+                    countdownEl.textContent = count;
+                    if (count === 0) {
+                        clearInterval(interval);
+                        mediaRecorder.stop();
+                        stream.getTracks().forEach((t) => t.stop());
+                    }
+                }, 1000);
+            } catch (err) {
+                console.error("Microphone access failed:", err);
+                alert(
+                    "Could not access the microphone. Please ensure you have a microphone connected and have granted permission in your browser."
+                );
+                recordBtn.disabled = false;
+            }
+        }
+
+        recordBtn.onclick = startRecording;
+    </script>
+</body>
+
+</html>

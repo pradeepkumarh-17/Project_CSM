@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>MindCare</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+      /* ===== EXACT COLORS SAMPLED FROM IMAGE ===== */
+
+      :root {
+        --bg-gradient: linear-gradient(
+          135deg,
+          #e7f6ee 0%,
+          #f7f3e3 45%,
+          #f3dfea 75%,
+          #dcd7f1 100%
+        );
+        --card-bg: #ffffff;
+        --card-soft: rgba(255, 255, 255, 0.65);
+        --text-main: #2f2f3a;
+        --text-sub: #7a7f8c;
+        --btn-gradient: linear-gradient(90deg, #a7e6cb, #c7b9f2);
+        --radius-lg: 24px;
+        --radius-md: 18px;
+        --shadow: 0 24px 48px rgba(0, 0, 0, 0.08);
+      }
+      /* ===== RESET ===== */
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+      }
+
+      body {
+        min-height: 100vh;
+        background: var(--bg-gradient);
+        color: var(--text-main);
+      }
+      /* ===== GLOBAL ===== */
+
+      section {
+        padding: 110px 24px;
+        display: flex;
+        justify-content: center;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 1200px;
+        text-align: center;
+      }
+
+      h1 {
+        font-size: 44px;
+        font-weight: 700;
+        margin-bottom: 18px;
+      }
+
+      h2 {
+        font-size: 38px;
+        font-weight: 700;
+        margin-bottom: 14px;
+      }
+
+      h3 {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+
+      p {
+        font-size: 16px;
+        color: var(--text-sub);
+        line-height: 1.6;
+      }
+      /* ===== BUTTONS ===== */
+
+      .primary-btn {
+        background: var(--btn-gradient);
+        border: none;
+        padding: 14px 30px;
+        border-radius: 999px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+      }
+
+      .secondary-btn {
+        background: #ffffff;
+        border: none;
+        padding: 14px 30px;
+        border-radius: 999px;
+        font-size: 16px;
+        box-shadow: var(--shadow);
+        cursor: pointer;
+      }
+      /* ===== ICON ===== */
+
+      .icon {
+        width: 68px;
+        height: 68px;
+        border-radius: 18px;
+        background: var(--btn-gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        margin: 0 auto 24px;
+      }
+      /* ===== GRID ===== */
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 36px;
+        margin-top: 56px;
+      }
+
+      .card {
+        background: var(--card-bg);
+        border-radius: var(--radius-md);
+        padding: 44px 32px;
+        box-shadow: var(--shadow);
+      }
+      /* ===== STEPS ===== */
+
+      .steps {
+        margin-top: 56px;
+        display: flex;
+        flex-direction: column;
+        gap: 26px;
+      }
+
+      .step {
+        background: var(--card-soft);
+        padding: 30px 34px;
+        border-radius: var(--radius-md);
+        display: flex;
+        gap: 22px;
+        text-align: left;
+      }
+
+      .step-num {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: var(--btn-gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+      }
+      /* ===== HERO CARD ===== */
+
+      .hero-card {
+        background: var(--card-bg);
+        padding: 70px 56px;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+      }
+      /* ===== FOOTER ===== */
+
+      footer {
+        padding: 40px 24px;
+        display: flex;
+        justify-content: space-between;
+        max-width: 1200px;
+        margin: auto;
+        font-size: 14px;
+        color: var(--text-sub);
+      }
+      /* ===== RESPONSIVE ===== */
+
+      @media (max-width: 900px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- 1️⃣ MINDCARE HERO -->
+    <section>
+      <div class="container">
+        <div class="icon">🧠</div>
+        <h1>MindCare</h1>
+        <p>Your AI-Powered Mental Wellness Companion</p>
+        <p style="max-width: 680px; margin: 18px auto">
+          Experience a comprehensive mental health assessment using advanced
+          machine learning. Get personalized insights and recommendations in
+          just minutes.
+        </p>
+
+        <div style="margin-top: 36px">
+          <a href="./auth/login.html">
+            <button class="primary-btn">Start Your Assessment</button>
+          </a>
+          <a href="#how-it-works">
+            <button class="secondary-btn">Learn More</button>
+          </a>
+        </div>
+
+        <div style="margin-top: 40px; font-size: 14px; color: #8a8f9c">
+          🛡 100% Private &nbsp;&nbsp; 🤖 AI-Powered &nbsp;&nbsp; 💜
+          Science-Based
+        </div>
+      </div>
+    </section>
+
+    <!-- 2️⃣ THREE PHASE -->
+    <section>
+      <div class="container">
+        <h2>Three-Phase Assessment</h2>
+        <p>
+          Our comprehensive approach combines multiple AI models for the most
+          accurate stress analysis
+        </p>
+
+        <div class="grid">
+          <div class="card">
+            <div class="icon">📷</div>
+            <h3>Facial Analysis</h3>
+            <p>
+              Advanced emotion detection using CNN models to analyze facial
+              expressions and stress indicators.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="icon">🎤</div>
+            <h3>Voice Pattern Analysis</h3>
+            <p>
+              LSTM-based voice analysis that detects stress through pitch, tone,
+              and speech patterns.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="icon">📋</div>
+            <h3>Wellness Survey</h3>
+            <p>
+              Random Forest classifier analyzes your responses to provide
+              accurate stress level predictions.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3️⃣ HOW IT WORKS -->
+    <section id="how-it-works">
+      <div class="container">
+        <h2>How It Works</h2>
+        <p>Simple, fast, and scientifically validated</p>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div>
+              <h3>Sign Up & Start</h3>
+              <p>
+                Create your secure account and begin your personalized
+                assessment journey in seconds.
+              </p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">2</div>
+            <div>
+              <h3>Complete Assessment</h3>
+              <p>
+                Facial recording, voice recording, and wellness survey. Takes
+                about 5 minutes.
+              </p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">3</div>
+            <div>
+              <h3>Get Insights & Recommendations</h3>
+              <p>Receive stress analysis with personalized recommendations.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4️⃣ WHY CHOOSE -->
+    <section>
+      <div class="container">
+        <h2>Why Choose MindCare?</h2>
+        <p>Your mental wellness is our priority</p>
+
+        <div class="grid">
+          <div class="card">
+            <div class="icon">♡</div>
+            <h3>Personalized Care</h3>
+            <p>Tailored recommendations based on your stress profile</p>
+          </div>
+
+          <div class="card">
+            <div class="icon">🛡</div>
+            <h3>Private & Secure</h3>
+            <p>Your data is encrypted and never shared</p>
+          </div>
+
+          <div class="card">
+            <div class="icon">📈</div>
+            <h3>Track Progress</h3>
+            <p>Monitor wellness journey with detailed history</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5️⃣ FINAL CTA -->
+    <section>
+      <div class="container">
+        <div class="hero-card">
+          <h1>Ready to Begin Your Wellness Journey?</h1>
+          <p>
+            Take the first step towards better mental health. Your personalized
+            assessment awaits.
+          </p>
+          <div style="margin-top: 32px">
+            <a href="./auth/login.html">
+              <button class="primary-btn">Get Started Free →</button>
+            </a>
+          </div>
+          <p style="margin-top: 22px; font-size: 14px">
+            No credit card required • 5-minute assessment • Instant results
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div>MindCare</div>
+      <div>© 2025 MindCare. Your mental wellness matters.</div>
+    </footer>
+  </body>
+</html>

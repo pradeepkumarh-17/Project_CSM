@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>MindCare | Results</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(120deg, #f6fff0 0%, #fff0f6 100%);
+            color: #222;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 28px;
+        }
+        
+        .hero {
+            background: linear-gradient(90deg, #b8e6cf 10%, #c8b9f2 100%);
+            border-radius: 18px;
+            padding: 46px 36px;
+            margin: 20px 0 40px;
+            text-align: center;
+            box-shadow: 0 12px 30px rgba(10, 10, 10, 0.06);
+        }
+        
+        .hero .hero-sub {
+            color: #7c7c7c;
+            margin-bottom: 8px;
+        }
+        
+        .hero .hero-title {
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+        
+        .hero .hero-level {
+            font-size: 44px;
+            font-weight: 800;
+            color: #ff9800;
+            margin-bottom: 8px;
+        }
+        
+        .hero .hero-conf {
+            color: #fff;
+            opacity: 0.9;
+            margin-bottom: 6px;
+        }
+        
+        .hero .hero-note {
+            color: #fff;
+            opacity: 0.85;
+            font-size: 13px;
+        }
+        
+        .phases-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 36px;
+        }
+        
+        .phase-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+        }
+        
+        .phase-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .phase-title {
+            font-weight: 700;
+        }
+        
+        .badge {
+            padding: 6px 10px;
+            border-radius: 12px;
+            font-size: 13px;
+            color: #fff;
+        }
+        
+        .badge.high {
+            background: #ff6b6b;
+        }
+        
+        .badge.medium {
+            background: #ffb74d;
+        }
+        
+        .badge.low {
+            background: #5ac18e;
+        }
+        
+        .metric {
+            color: #555;
+            margin: 6px 0;
+        }
+        
+        .progress-wrap {
+            height: 8px;
+            background: #eef6f2;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #a7e6cb, #c7b9f2);
+            width: 0%;
+            transition: width 0.6s ease;
+        }
+        
+        .recommendations {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 48px;
+        }
+        
+        .rec-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px 18px 18px 18px;
+            box-shadow: 0 12px 28px rgba(20, 20, 40, 0.06);
+            min-width: 220px;
+            position: relative;
+            overflow: visible;
+        }
+        
+        .rec-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        
+        .rec-icon {
+            font-size: 22px;
+        }
+        
+        .rec-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #222;
+        }
+        
+        .rec-category {
+            position: absolute;
+            right: 14px;
+            top: 14px;
+            background: rgba(230, 230, 255, 0.9);
+            color: #556;
+            padding: 6px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        
+        .rec-desc {
+            color: #666;
+            margin: 10px 0 14px;
+        }
+        
+        .rec-btn {
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(90deg, #9de6c7, #cbb7f3);
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 18px rgba(160, 160, 200, 0.12);
+        }
+        
+        .rec-btn .play {
+            margin-right: 8px;
+            opacity: 0.95;
+        }
+        
+        @media (max-width: 1000px) {
+            .recommendations {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 700px) {
+            .recommendations {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 700px) {
+            .hero .hero-level {
+                font-size: 28px;
+            }
+            .phases-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 style="text-align: center">Assessment Results</h1>
+
+        <div id="hero" class="hero">
+            <div class="hero-sub">
+                Here are your comprehensive mental wellness results
+            </div>
+            <div class="hero-title">Overall Mental Stress Level</div>
+            <div id="hero-level" class="hero-level">Medium Stress</div>
+            <div id="hero-conf" class="hero-conf">80.0% Confidence</div>
+            <div class="hero-note">
+                Based on majority voting from all three assessments
+            </div>
+        </div>
+
+        <div class="phases-grid">
+            <div id="faceCard" class="phase-card"></div>
+            <div id="voiceCard" class="phase-card"></div>
+            <div id="surveyCard" class="phase-card"></div>
+        </div>
+
+        <h3 style="margin-bottom: 12px; color: #444">
+            Personalized Recommendations
+        </h3>
+        <div id="recommendations" class="recommendations"></div>
+
+        <div class="actions" style="
+          display: flex;
+          gap: 12px;
+          margin-top: 18px;
+          margin-bottom: 36px;
+          justify-content: flex-end;
+        ">
+            <button id="dashboardBtn" class="action-btn" style="
+            padding: 12px 18px;
+            border-radius: 10px;
+            border: none;
+            background: #8fc0ff;
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+          ">
+          ← Dashboard
+        </button>
+            <button id="downloadPdfBtn" class="action-btn" style="
+            padding: 12px 18px;
+            border-radius: 10px;
+            border: none;
+            background: #6ad67a;
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+          ">
+          Download PDF
+        </button>
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+        <script>
+            // Load final result from sessionStorage (safe parse)
+            let result = (function() {
+                try {
+                    const r = sessionStorage.getItem("finalResult");
+                    return r ? JSON.parse(r) : {};
+                } catch (e) {
+                    console.error("Failed to parse finalResult", e);
+                    return {};
+                }
+            })();
+
+            // Recommendations data (same as in face.html)
+            const wellnessDatabase = {
+                high: [{
+                    category: "Meditation",
+                    icon: "🧠",
+                    title: "Deep Guided Meditation",
+                    description: "10–15 minute guided meditation with calm narration and focus-based breathing exercises.",
+                    action: "Start Session",
+                    content: {
+                        type: "meditation",
+                        duration: "10-15 minutes",
+                        items: [
+                            "Find a quiet, comfortable space where you won't be disturbed",
+                            "Sit in a relaxed position with your spine straight",
+                            "Close your eyes and take three deep breaths",
+                            "Focus your attention on your breath flowing in and out",
+                            "When thoughts arise, acknowledge them without judgment and return to your breath",
+                            "Visualize a peaceful place - a beach, forest, or mountain",
+                            "Feel the tension releasing from your body with each exhale",
+                            "Continue for 10-15 minutes, staying present in each moment",
+                            "When ready, slowly open your eyes and return to the present",
+                        ],
+                        videoUrl: "https://www.youtube.com/embed/inpok4MKVLM",
+                    },
+                }, {
+                    category: "Breathing",
+                    icon: "💨",
+                    title: "4-7-8 Breathing Technique",
+                    description: "Deep breathing exercise with box breathing animations to rapidly reduce stress.",
+                    action: "Begin Exercise",
+                    content: {
+                        type: "breathing",
+                        duration: "5 minutes",
+                        items: [
+                            "Sit comfortably with your back straight",
+                            "Place the tip of your tongue against the ridge behind your upper front teeth",
+                            "Exhale completely through your mouth, making a whoosh sound",
+                            "Close your mouth and inhale quietly through your nose for 4 counts",
+                            "Hold your breath for 7 counts",
+                            "Exhale completely through your mouth for 8 counts, making a whoosh sound",
+                            "Repeat the cycle 3-4 times",
+                            "Practice this technique twice daily for maximum benefit",
+                        ],
+                    },
+                }, {
+                    category: "Music",
+                    icon: "🎵",
+                    title: "Deep Relaxation Music",
+                    description: "Slow instrumental or binaural relaxation music (60–70 BPM) to calm your mind.",
+                    action: "Play Music",
+                    content: {
+                        type: "music",
+                        items: [
+                            "🎵 Weightless by Marconi Union (scientifically proven to reduce anxiety by 65%)",
+                            "🌊 Ocean Waves with Soft Piano - 3 Hours",
+                            "🎹 Ludovico Einaudi - Nuvole Bianche (Piano Relaxation)",
+                            "🧘 Binaural Beats for Deep Relaxation (432 Hz)",
+                            "🌙 Tibetan Singing Bowl Meditation",
+                            "🎻 Max Richter - Sleep (8 Hour Peaceful Music)",
+                        ],
+                        audioUrl: "https://www.youtube.com/embed/UfcAVejslrU",
+                    },
+                }, {
+                    category: "Physical Activity",
+                    icon: "�️",
+                    title: "Gentle Movement",
+                    description: "Light stretching routine or short outdoor walk to release tension.",
+                    action: "View Exercises",
+                    content: {
+                        type: "exercise",
+                        duration: "10-15 minutes",
+                        items: [
+                            "Neck Rolls: Gently roll your head in circles (5 times each direction)",
+                            "Shoulder Shrugs: Raise shoulders to ears, hold 3 seconds, release (10 reps)",
+                            "Seated Spinal Twist: Sit and gently twist torso left and right (hold 20 seconds each)",
+                            "Forward Fold: Stand and bend forward, letting arms dangle (hold 30 seconds)",
+                            "Cat-Cow Stretch: On hands and knees, alternate arching and rounding back (10 reps)",
+                            "Take a 10-minute nature walk, focusing on your surroundings",
+                            "Practice walking meditation: slow, deliberate steps with mindful breathing",
+                            "End with gentle arm and leg stretches",
+                        ],
+                    },
+                }, {
+                    category: "Diet Plan",
+                    icon: "🍽️",
+                    title: "Stress-Relief Nutrition",
+                    description: "Foods rich in magnesium, omega-3s, and hydration reminders for optimal mental health.",
+                    action: "View Plan",
+                    content: {
+                        type: "diet",
+                        items: [
+                            "🥑 Breakfast: Avocado toast with salmon (omega-3s) + green tea",
+                            "🥗 Lunch: Spinach salad with nuts, seeds, and grilled chicken (magnesium)",
+                            "🐟 Dinner: Grilled fish with sweet potato and steamed broccoli",
+                            "🍇 Snacks: Dark chocolate (70%+ cacao), almonds, blueberries, bananas",
+                            "☕ Drinks: Chamomile tea, green tea, warm lemon water",
+                            "💧 Hydration: Drink 8-10 glasses of water daily",
+                            "❌ Avoid: Excessive caffeine, processed foods, high sugar intake",
+                            "🌿 Supplements: Consider magnesium glycinate, omega-3, vitamin B complex (consult doctor)",
+                        ],
+                    },
+                }, {
+                    category: "Mind Tips",
+                    icon: "💡",
+                    title: "Digital Detox",
+                    description: "Take a digital break and write down 3 things you're grateful for today.",
+                    action: "Read More",
+                    content: {
+                        type: "tips",
+                        items: [
+                            "📱 Turn off non-essential notifications for 2-3 hours",
+                            "📝 Write down 3 things you're grateful for each morning",
+                            "🚫 Set screen time limits: no phones 1 hour before bed",
+                            "🌳 Spend 20 minutes in nature without your phone",
+                            "📖 Read a physical book instead of scrolling social media",
+                            "🧘 Practice single-tasking: focus on one thing at a time",
+                            "💬 Have a meaningful face-to-face conversation today",
+                            "🎨 Engage in a creative hobby (drawing, writing, crafting)",
+                            "🛀 Take a relaxing bath with no electronics",
+                            "😊 Perform one random act of kindness",
+                        ],
+                        videoUrl: "https://www.youtube.com/embed/ZToicYcHIOU",
+                    },
+                }, ],
+                medium: [{
+                    category: "Meditation",
+                    icon: "🧠",
+                    title: "Mindfulness Meditation",
+                    description: "5–7 minute mindfulness session focusing on breathing and gratitude.",
+                    action: "Start Session",
+                    content: {
+                        type: "meditation",
+                        duration: "5-7 minutes",
+                        items: [
+                            "Sit comfortably in a quiet space",
+                            "Close your eyes and take 3 deep, cleansing breaths",
+                            "Bring your attention to your breathing - notice each inhale and exhale",
+                            "If your mind wanders, gently guide it back without judgment",
+                            "Think of 3 things you're grateful for today",
+                            "Visualize each one clearly and feel the gratitude",
+                            "Return focus to your breath for the final 2 minutes",
+                            "Slowly open your eyes when ready",
+                        ],
+                        videoUrl: "https://www.youtube.com/embed/ZToicYcHIOU",
+                    },
+                }, {
+                    category: "Breathing",
+                    icon: "🌬️",
+                    title: "Alternate Nostril Breathing",
+                    description: "Rhythmic inhale-exhale training to balance your energy and focus.",
+                    action: "Begin Exercise",
+                    content: {
+                        type: "breathing",
+                        duration: "5 minutes",
+                        items: [
+                            "Sit comfortably with your spine straight",
+                            "Use your right thumb to close your right nostril",
+                            "Inhale slowly through your left nostril for 4 counts",
+                            "Close both nostrils and hold for 4 counts",
+                            "Release your thumb and exhale through right nostril for 4 counts",
+                            "Inhale through right nostril for 4 counts",
+                            "Close both nostrils and hold for 4 counts",
+                            "Release and exhale through left nostril",
+                            "Repeat 5-10 cycles for balance and calm",
+                        ],
+                    },
+                }, {
+                    category: "Music",
+                    icon: "🎵",
+                    title: "Calm Ambient Sounds",
+                    description: "Calm ambient background music or light piano to maintain peaceful state.",
+                    action: "Play Music",
+                    content: {
+                        type: "music",
+                        items: [
+                            "Yiruma - River Flows in You (Gentle Piano)",
+                            "Rain Sounds with Soft Instrumental (1 Hour)",
+                            "Lo-fi Beats for Focus and Relaxation",
+                            "Peaceful Classical Music Collection",
+                            "Nature Sounds - Forest Birds & Stream",
+                            "Brian Eno - Ambient 1: Music for Airports",
+                        ],
+                        audioUrl: "https://www.youtube.com/embed/7maJOI3QMu0",
+                    },
+                }, {
+                    category: "Physical Activity",
+                    icon: "🧘",
+                    title: "Light Yoga",
+                    description: "Simple yoga poses or standing stretches between tasks to stay energized.",
+                    action: "View Exercises",
+                    content: {
+                        type: "exercise",
+                        duration: "10 minutes",
+                        items: [
+                            "Child's Pose: Kneel and stretch arms forward on ground (hold 30 seconds)",
+                            "Cat-Cow Pose: Flow between arching and rounding spine (10 reps)",
+                            "Downward Dog: Form inverted V shape with body (hold 30 seconds)",
+                            "Warrior I: Step forward into lunge with arms raised (hold 20 seconds each side)",
+                            "Tree Pose: Balance on one leg with foot on inner thigh (hold 20 seconds each)",
+                            "Seated Forward Bend: Reach for toes while seated (hold 30 seconds)",
+                            "Take standing breaks every hour: stretch arms overhead, side bends",
+                            "End with Corpse Pose: Lie flat and relax completely (2 minutes)",
+                        ],
+                    },
+                }, {
+                    category: "Diet Plan",
+                    icon: "🍽️",
+                    title: "Balanced Nutrition",
+                    description: "Balanced meals, herbal tea, and fresh fruits for sustained energy.",
+                    action: "View Plan",
+                    content: {
+                        type: "diet",
+                        items: [
+                            "🍳 Breakfast: Oatmeal with berries, nuts, and honey + herbal tea",
+                            "🥪 Lunch: Whole grain wrap with lean protein, veggies, and hummus",
+                            "🍲 Dinner: Quinoa bowl with roasted vegetables and grilled chicken",
+                            "🍎 Snacks: Fresh fruits (apples, oranges), mixed nuts, yogurt",
+                            "🍵 Drinks: Green tea, chamomile tea, infused water with lemon/cucumber",
+                            "💧 Stay hydrated: 6-8 glasses of water throughout the day",
+                            "⚖️ Balance: Include protein, healthy fats, and complex carbs in each meal",
+                            "🥄 Portion control: Use smaller plates, eat mindfully",
+                        ],
+                    },
+                }, {
+                    category: "Mind Tips",
+                    icon: "💡",
+                    title: "Focus Enhancement",
+                    description: "Try short journaling and reduce multitasking for the next hour.",
+                    action: "Read More",
+                    content: {
+                        type: "tips",
+                        items: [
+                            "📓 Journal for 5 minutes: write thoughts, feelings, or goals",
+                            "✅ Create a simple to-do list: prioritize top 3 tasks for today",
+                            "🔕 Silence notifications for 1-2 hours of focused work",
+                            "⏰ Use Pomodoro technique: 25 min work, 5 min break",
+                            "🧠 Single-task: Complete one thing before starting another",
+                            "🚶 Take micro-breaks: Stand and stretch every 30 minutes",
+                            "📱 Limit social media: Set specific times to check, not constantly",
+                            "💡 Practice mindful transitions: Pause between tasks, take 3 breaths",
+                            "🎯 Set clear boundaries: Know when to say no to distractions",
+                        ],
+                    },
+                }, ],
+                low: [{
+                    category: "Meditation",
+                    icon: "🧠",
+                    title: "Quick Mental Refresh",
+                    description: "2–3 minute short mental refresh meditation to maintain clarity.",
+                    action: "Start Session",
+                    content: {
+                        type: "meditation",
+                        duration: "2-3 minutes",
+                        items: [
+                            "Take a comfortable seated position",
+                            "Close your eyes and take 3 deep breaths",
+                            "Focus on the sensation of breathing for 2 minutes",
+                            "Notice the peace in this present moment",
+                            "When ready, slowly open your eyes feeling refreshed",
+                        ],
+                        videoUrl: "https://youtu.be/2QcXW7SyA74?si=50eEXb6-Yyq2GIOt",
+                    },
+                }, {
+                    category: "Breathing",
+                    icon: "💨",
+                    title: "Mindful Breathing",
+                    description: "Simple mindful breathing reminder every few hours to stay centered.",
+                    action: "Begin Exercise",
+                    content: {
+                        type: "breathing",
+                        duration: "2 minutes",
+                        items: [
+                            "Pause whatever you're doing",
+                            "Place one hand on your chest, one on your belly",
+                            "Take a slow, deep breath in through your nose for 4 counts",
+                            "Feel your belly expand",
+                            "Exhale slowly through your mouth for 4 counts",
+                            "Repeat 5-10 times",
+                            "Notice how you feel more grounded and present",
+                            "Set reminders to practice this every 2-3 hours",
+                        ],
+                    },
+                }, {
+                    category: "Music",
+                    icon: "🎵",
+                    title: "Uplifting Playlists",
+                    description: "Uplifting or focus-enhancing playlists to boost productivity.",
+                    action: "Play Music",
+                    content: {
+                        type: "music",
+                        items: [
+                            "🎵 Happy Upbeat Background Music for Work",
+                            "🎸 Acoustic Pop Covers for Positive Vibes",
+                            "☕ Coffee Shop Jazz for Focus",
+                            "🎹 Inspiring Classical Music Collection",
+                            "🎧 Lo-fi Hip Hop Study Beats",
+                            "🌅 Positive Morning Motivation Music",
+                        ],
+                        audioUrl: "https://www.youtube.com/embed/jfKfPfyJRdk",
+                    },
+                }, {
+                    category: "Physical Activity",
+                    icon: "🏃",
+                    title: "Maintain Routine",
+                    description: "Continue daily physical routine and maintain good posture.",
+                    action: "View Exercises",
+                    content: {
+                        type: "exercise",
+                        duration: "Daily routine",
+                        items: [
+                            "Continue your current exercise routine - you're doing great!",
+                            "Maintain good posture: Shoulders back, spine straight when sitting",
+                            "Take movement breaks: Stand and walk around every hour",
+                            "Desk stretches: Arm circles, neck rolls, wrist stretches",
+                            "Stay active: Take stairs instead of elevator when possible",
+                            "Morning routine: Light stretching or yoga (5-10 minutes)",
+                            "Evening walk: 15-20 minutes for physical and mental health",
+                            "Stay consistent: Regular movement is key to maintaining wellness",
+                        ],
+                    },
+                }, {
+                    category: "Diet Plan",
+                    icon: "🍽️",
+                    title: "Regular Nutrition",
+                    description: "Maintain regular hydration and protein intake for optimal performance.",
+                    action: "View Plan",
+                    content: {
+                        type: "diet",
+                        items: [
+                            "🥚 Continue balanced meals: Include protein, vegetables, and whole grains",
+                            "💧 Hydration goal: 8 glasses of water daily",
+                            "🍗 Protein sources: Eggs, chicken, fish, legumes, tofu",
+                            "🥗 Vegetables: Aim for colorful variety throughout the day",
+                            "🍚 Complex carbs: Brown rice, quinoa, sweet potatoes, whole wheat",
+                            "🥑 Healthy fats: Avocado, olive oil, nuts, seeds",
+                            "🍎 Snack smart: Keep fruits and nuts handy",
+                            "⏰ Regular timing: Eat at consistent times to maintain energy",
+                        ],
+                    },
+                }, {
+                    category: "Mind Tips",
+                    icon: "💡",
+                    title: "Spread Positivity",
+                    description: "Keep a gratitude log and share positivity with someone today.",
+                    action: "Read More",
+                    content: {
+                        type: "tips",
+                        items: [
+                            "📝 Morning gratitude: List 3 things you're grateful for",
+                            "😊 Compliment someone genuinely today",
+                            "💌 Send a thoughtful message to a friend or family member",
+                            "🎁 Perform a random act of kindness",
+                            "🌟 Share good news or positive content with others",
+                            "📸 Take a moment to appreciate something beautiful",
+                            "🤝 Help someone without expecting anything in return",
+                            "🎉 Celebrate small wins - yours and others'",
+                            "💭 Reflect on positive moments before bed",
+                            "🌱 Continue practices that bring you joy and peace",
+                        ],
+                    },
+                }, ],
+            };
+            const RECOMMENDATIONS = {
+                High: wellnessDatabase.high,
+                Medium: wellnessDatabase.medium,
+                Low: wellnessDatabase.low,
+            };
+
+            const normalize = (s) =>
+                s && s.toString ?
+                s.toString().charAt(0).toUpperCase() +
+                s.toString().slice(1).toLowerCase() :
+                "";
+
+            function renderHero(level, confidence) {
+                const lvl = normalize(level) || "Medium";
+                document.getElementById("hero-level").textContent = `${lvl} Stress`;
+                document.getElementById("hero-conf").textContent = `${Number(
+            confidence || 0
+          ).toFixed(1)}% Confidence`;
+            }
+
+            function badgeFor(level) {
+                const l = normalize(level);
+                if (l === "High")
+                    return '<span class="badge high">High Stress</span>';
+                if (l === "Medium")
+                    return '<span class="badge medium">Medium Stress</span>';
+                if (l === "Low") return '<span class="badge low">Low Stress</span>';
+                return '<span class="badge">N/A</span>';
+            }
+
+            function renderPhaseCard(phase, elId, title) {
+                const el = document.getElementById(elId);
+                const lvl = normalize(phase.stressLevel) || "Unavailable";
+                const conf = Number(phase.confidence || 0).toFixed(1);
+                let body = `<div class="phase-header"><div class="phase-title">${title}</div>${badgeFor(
+            lvl
+          )}</div>`;
+                if (phase.emotion)
+                    body += `<div class="metric">🎭 Emotion: <strong>${phase.emotion}</strong></div>`;
+                if (phase.pitch !== undefined)
+                    body += `<div class="metric">🎵 Pitch: <strong>${phase.pitch} Hz</strong></div>`;
+                if (phase.score !== undefined)
+                    body += `<div class="metric">📊 Score: <strong>${phase.score}%</strong></div>`;
+                body += `<div class="metric">✓ Confidence: <strong>${conf}%</strong></div>`;
+                body += `<div class="progress-wrap"><div class="progress-bar" style="width:${Math.min(
+            100,
+            Math.max(0, conf)
+          )}%"></div></div>`;
+                el.innerHTML = body;
+            }
+
+            function renderRecommendations(level) {
+                const container = document.getElementById("recommendations");
+                container.innerHTML = "";
+                const key = normalize(level) || "Medium";
+                const list = RECOMMENDATIONS[key] || RECOMMENDATIONS.Medium || [];
+                if (!list.length) {
+                    container.innerHTML =
+                        '<div style="color:#666">No recommendations available.</div>';
+                    return;
+                }
+
+                list.forEach((rec) => {
+                    const card = document.createElement("div");
+                    card.className = "rec-card";
+
+                    // header (icon + title)
+                    const header = document.createElement("div");
+                    header.className = "rec-header";
+                    const icon = document.createElement("div");
+                    icon.className = "rec-icon";
+                    icon.textContent = rec.icon || "🧠";
+                    const title = document.createElement("div");
+                    title.className = "rec-title";
+                    title.textContent = rec.title || "";
+                    header.appendChild(icon);
+                    header.appendChild(title);
+
+                    // category badge
+                    const cat = document.createElement("div");
+                    cat.className = "rec-category";
+                    cat.textContent = rec.category || "";
+                    card.appendChild(cat);
+
+                    card.appendChild(header);
+
+                    // description
+                    const desc = document.createElement("div");
+                    desc.className = "rec-desc";
+                    desc.textContent = rec.description || "";
+                    card.appendChild(desc);
+
+                    // action button full width
+                    const btn = document.createElement("button");
+                    btn.className = "rec-btn";
+                    btn.innerHTML = `<span class="play">▶</span>${
+              rec.action || "Open"
+            }`;
+                    btn.onclick = () => showPlanDetail(rec);
+                    card.appendChild(btn);
+
+                    container.appendChild(card);
+                });
+            }
+
+            // Modal builder (keeps same behavior)
+            function showPlanDetail(rec) {
+                let modal = document.getElementById("planModal");
+                if (!modal) {
+                    modal = document.createElement("div");
+                    modal.id = "planModal";
+                    modal.style =
+                        "position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:9999;";
+                    modal.innerHTML = `<div id='planContent' style='background:#fff;border-radius:12px;max-width:900px;width:90%;padding:20px;overflow:auto;max-height:80vh;'></div>`;
+                    modal.onclick = (e) => {
+                        if (e.target === modal) modal.remove();
+                    };
+                    document.body.appendChild(modal);
+                }
+                const content = document.getElementById("planContent");
+                content.innerHTML = `
+                  <div style='display:flex;justify-content:space-between;align-items:center'>
+                    <div style='font-size:22px'>${rec.icon} <strong>${
+            rec.title
+          }</strong></div>
+                    <button onclick='document.getElementById("planModal").remove()' style='padding:8px 12px;border-radius:8px;border:none;background:#eee;cursor:pointer'>Close</button>
+                  </div>
+                  <p style='color:#555;margin-top:10px'>${rec.description}</p>
+                  <div style='margin-top:12px'><strong>Details:</strong></div>
+                  <ul style='margin-top:8px'>${rec.content.items
+                    .map((i) => `<li>${i}</li>`)
+                    .join("")}</ul>
+                `;
+          if (rec.content.videoUrl)
+            content.innerHTML += `<div style='margin-top:12px'><iframe width='100%' height='360' src='${rec.content.videoUrl}' frameborder='0' allowfullscreen></iframe></div>`;
+          else if (rec.content.audioUrl)
+            content.innerHTML += `<div style='margin-top:12px'><iframe width='100%' height='180' src='${rec.content.audioUrl}' frameborder='0' allowfullscreen></iframe></div>`;
+        }
+
+        // Initial render — fill hero, phases and recommendations
+        const chosenLevel = normalize(result.stressLevel) || "Medium";
+        const conf = Number(result.confidence) || 0;
+        renderHero(chosenLevel, conf);
+        renderPhaseCard(result.phase1 || {}, "faceCard", "Facial Analysis");
+        renderPhaseCard(result.phase2 || {}, "voiceCard", "Voice Analysis");
+        renderPhaseCard(result.phase3 || {}, "surveyCard", "Survey Analysis");
+        renderRecommendations(chosenLevel);
+
+        // Attach button handlers
+        (function () {
+          const dashboardBtn = document.getElementById("dashboardBtn");
+          if (dashboardBtn) {
+            dashboardBtn.addEventListener("click", function () {
+              // Try absolute path first, then relative fallback
+              fetch("/dashboard.html", { method: "HEAD" })
+                .then((resp) => {
+                  if (resp.ok) window.location.href = "/dashboard.html";
+                  else {
+                    fetch("../dashboard.html", { method: "HEAD" })
+                      .then((r2) => {
+                        if (r2.ok) window.location.href = "../dashboard.html";
+                        else {
+                          alert(
+                            "Dashboard page not found. Please navigate manually to the dashboard."
+                          );
+                        }
+                      })
+                      .catch(() => {
+                        window.location.href = "/dashboard.html";
+                      });
+                  }
+                })
+                .catch(() => {
+                  window.location.href = "../dashboard.html";
+                });
+            });
+          }
+
+          const downloadBtn = document.getElementById("downloadPdfBtn");
+          if (downloadBtn) {
+            downloadBtn.addEventListener("click", async function () {
+              const btn = this;
+              btn.disabled = true;
+              const originalText = btn.textContent;
+              btn.textContent = "Generating PDF…";
+              try {
+                // Rebuild a minimal, deterministic results-only document from `result`
+                const wrap = document.createElement("div");
+                wrap.style.background = "#fff";
+                wrap.style.padding = "20px";
+                wrap.style.color = "#222";
+
+                // Title + timestamp
+                const title = document.createElement("div");
+                title.innerHTML = `<h1 style="text-align:center;margin:0 0 8px">Assessment Results</h1><div style="text-align:center;color:#666;margin-bottom:16px;font-size:13px">Generated: ${new Date().toLocaleString()}</div>`;
+                wrap.appendChild(title);
+
+                // Hero summary (use `result` as source of truth, fallback to DOM)
+                const heroBox = document.createElement("div");
+                heroBox.style =
+                  "background:linear-gradient(90deg,#b8e6cf 10%,#c8b9f2 100%);border-radius:12px;padding:18px;margin-bottom:12px;text-align:center;color:#fff";
+                const lvlText =
+                  result && result.stressLevel
+                    ? normalize(result.stressLevel) + " Stress"
+                    : document.getElementById("hero-level").textContent;
+                const confText =
+                  result && result.confidence !== undefined
+                    ? Number(result.confidence).toFixed(1) + "% Confidence"
+                    : document.getElementById("hero-conf").textContent;
+                heroBox.innerHTML = `<div style="font-weight:700;font-size:20px;margin-bottom:6px">${lvlText}</div><div style="opacity:0.95">${confText}</div>`;
+                wrap.appendChild(heroBox);
+
+                // Build compact phase cards from the `result` object
+                const grid = document.createElement("div");
+                grid.style =
+                  "display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:8px";
+                function buildPhaseCard(title, phase) {
+                  const card = document.createElement("div");
+                  card.style =
+                    "background:#fff;border-radius:8px;padding:12px;border:1px solid #eee";
+                  const lvl =
+                    phase && phase.stressLevel
+                      ? normalize(phase.stressLevel)
+                      : "Unavailable";
+                  const conf =
+                    phase && phase.confidence !== undefined
+                      ? Number(phase.confidence).toFixed(1)
+                      : "0.0";
+                  let html = `<div style="font-weight:700;margin-bottom:8px">${title}</div>`;
+                  html += `<div style="margin-bottom:6px"><strong>Stress:</strong> ${lvl}</div>`;
+                  if (phase && phase.emotion)
+                    html += `<div style="margin-bottom:4px"><strong>Emotion:</strong> ${phase.emotion}</div>`;
+                  if (phase && phase.pitch !== undefined)
+                    html += `<div style="margin-bottom:4px"><strong>Pitch:</strong> ${phase.pitch} Hz</div>`;
+                  if (phase && phase.score !== undefined)
+                    html += `<div style="margin-bottom:4px"><strong>Score:</strong> ${phase.score}%</div>`;
+                  html += `<div style="margin-top:8px;color:#666"><strong>Confidence:</strong> ${conf}%</div>`;
+                  card.innerHTML = html;
+                  return card;
+                }
+                grid.appendChild(
+                  buildPhaseCard("Facial Analysis", result.phase1 || {})
+                );
+                grid.appendChild(
+                  buildPhaseCard("Voice Analysis", result.phase2 || {})
+                );
+                grid.appendChild(
+                  buildPhaseCard("Survey Analysis", result.phase3 || {})
+                );
+                wrap.appendChild(grid);
+
+                const opt = {
+                  margin: 10,
+                  filename: `mindcare_results_${new Date()
+                    .toISOString()
+                    .slice(0, 19)
+                    .replace(/[:T]/g, "-")}.pdf`,
+                  image: { type: "jpeg", quality: 0.98 },
+                  html2canvas: { scale: 2, useCORS: true },
+                  jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+                };
+
+                await html2pdf().from(wrap).set(opt).save();
+              } catch (err) {
+                console.error("PDF generation failed", err);
+                alert(
+                  "Failed to generate PDF. Please check your internet connection and try again."
+                );
+              } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+              }
+            });
+          }
+        })();
+        </script>
+    </div>
+</body>
+
+</html>

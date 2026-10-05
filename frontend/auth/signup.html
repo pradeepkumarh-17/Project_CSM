@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>MindCare | Sign Up</title>
+    <link rel="stylesheet" href="auth.css" />
+</head>
+
+<body>
+    <div class="auth-card">
+        <div class="logo">🧠</div>
+
+        <h1>MindCare</h1>
+        <p class="subtitle">Create your wellness account</p>
+
+        <label>Email</label>
+        <input id="email" type="email" placeholder="you@example.com" />
+
+        <label>Password</label>
+        <input id="password" type="password" />
+
+        <label>Confirm Password</label>
+        <input id="confirm" type="password" />
+
+        <button id="create" type="button">Create Account</button>
+        <div id="error" style="color: #b00020; margin-top: 8px"></div>
+
+        <script>
+            (function() {
+                const emailEl = document.getElementById("email");
+                const passEl = document.getElementById("password");
+                const confirmEl = document.getElementById("confirm");
+                const btn = document.getElementById("create");
+                const errorEl = document.getElementById("error");
+
+                async function doRegister() {
+                    errorEl.textContent = "";
+                    const email = (emailEl.value || "").trim();
+                    const password = passEl.value || "";
+                    const confirm = confirmEl.value || "";
+                    if (!email || !password) {
+                        errorEl.textContent = "Missing email or password.";
+                        return;
+                    }
+                    if (password !== confirm) {
+                        errorEl.textContent = "Passwords do not match.";
+                        return;
+                    }
+                    btn.disabled = true;
+                    try {
+                        const r = await fetch("/api/register", {
+                            method: "POST",
+                            credentials: "same-origin",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                email,
+                                password
+                            }),
+                        });
+                        let j = {};
+                        try {
+                            j = await r.json();
+                        } catch (e) {}
+                        if (r.ok && j.success) {
+                            window.location.href = "/dashboard.html";
+                        } else {
+                            errorEl.textContent =
+                                j.error || `Register failed (${r.status})`;
+                        }
+                    } catch (err) {
+                        console.error("Register error", err);
+                        errorEl.textContent =
+                            "Network or server error. See console for details.";
+                    } finally {
+                        btn.disabled = false;
+                    }
+                }
+
+                btn.addEventListener("click", doRegister);
+                [emailEl, passEl, confirmEl].forEach((el) =>
+                    el.addEventListener("keydown", (e) => {
+                        if (e.key === "Enter") doRegister();
+                    })
+                );
+            })();
+        </script>
+
+        <div class="switch">
+            Already have an account? <a href="login.html">Sign in</a>
+        </div>
+    </div>
+</body>
+
+</html>

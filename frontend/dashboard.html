@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>MindCare | Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+      :root {
+        --bg-gradient: linear-gradient(
+          135deg,
+          #e6f6ee 0%,
+          #f7f3de 40%,
+          #f3d9e8 70%,
+          #dcd7f1 100%
+        );
+        --card-bg: #ffffff;
+        --soft-card: rgba(255, 255, 255, 0.75);
+        --text-main: #2f2f3a;
+        --text-muted: #7a7f8c;
+        --accent-gradient: linear-gradient(90deg, #a7e6cb, #c7b9f2);
+        --radius-lg: 24px;
+        --radius-md: 18px;
+        --shadow: 0 24px 48px rgba(0, 0, 0, 0.08);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      }
+
+      body {
+        min-height: 100vh;
+        background: var(--bg-gradient);
+        color: var(--text-main);
+      }
+      /* ---------- NAVBAR ---------- */
+
+      .navbar {
+        height: 64px;
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(6px);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 32px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .brand-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: var(--accent-gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .brand-text {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .brand-text strong {
+        font-size: 16px;
+      }
+
+      .brand-text span {
+        font-size: 13px;
+        color: var(--text-muted);
+      }
+
+      .signout {
+        font-size: 14px;
+        cursor: pointer;
+      }
+      /* ---------- MAIN ---------- */
+
+      main {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 80px 24px;
+        text-align: center;
+      }
+
+      h1 {
+        font-size: 38px;
+        font-weight: 700;
+        margin-bottom: 12px;
+      }
+
+      h1 span {
+        color: #9bcfc2;
+      }
+
+      .subtitle {
+        max-width: 640px;
+        margin: 0 auto 56px;
+        color: var(--text-muted);
+        font-size: 16px;
+        line-height: 1.6;
+      }
+      /* ---------- ASSESSMENT CARD ---------- */
+
+      .assessment {
+        background: var(--accent-gradient);
+        border-radius: var(--radius-lg);
+        padding: 40px;
+        color: #2f2f3a;
+        box-shadow: var(--shadow);
+        margin-bottom: 56px;
+      }
+
+      .assessment h2 {
+        font-size: 26px;
+        margin-bottom: 8px;
+      }
+
+      .assessment p {
+        font-size: 15px;
+        margin-bottom: 22px;
+      }
+
+      .assessment button {
+        background: #ffffff;
+        border: none;
+        padding: 12px 26px;
+        border-radius: 999px;
+        font-size: 15px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+      }
+      /* ---------- CARDS ---------- */
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 32px;
+        margin-bottom: 60px;
+      }
+
+      .card {
+        background: var(--card-bg);
+        border-radius: var(--radius-md);
+        padding: 36px 30px;
+        box-shadow: var(--shadow);
+        text-align: left;
+      }
+
+      .card-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        background: var(--accent-gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 18px;
+      }
+
+      .card h3 {
+        font-size: 20px;
+        margin-bottom: 10px;
+      }
+
+      .card p {
+        font-size: 14px;
+        color: var(--text-muted);
+        line-height: 1.6;
+      }
+      /* ---------- QUOTE ---------- */
+
+      .quote {
+        background: var(--soft-card);
+        border-radius: var(--radius-lg);
+        padding: 26px;
+        font-style: italic;
+        color: #6f7480;
+      }
+      /* ---------- RESPONSIVE ---------- */
+
+      @media (max-width: 900px) {
+        .cards {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- NAVBAR -->
+    <div class="navbar">
+      <div class="brand">
+        <div class="brand-icon">🧠</div>
+        <div class="brand-text">
+          <strong>MindCare</strong>
+          <span>Your Mental Wellness Companion</span>
+        </div>
+      </div>
+
+      <div class="signout" id="signOutBtn" role="button" tabindex="0">
+        Sign Out
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main>
+      <h1>Welcome back, <span id="userDisplay">pramu</span></h1>
+
+      <p class="subtitle">
+        Take a moment to check in with yourself. Our three-phase assessment will
+        help you understand your current mental state.
+      </p>
+
+      <!-- ASSESSMENT CTA -->
+      <div class="assessment">
+        <h2>Ready for Your Assessment?</h2>
+        <p>
+          Complete our three-phase analysis: facial expressions, voice patterns,
+          and a brief survey
+        </p>
+        <button onclick="window.location.href='./assessment/face.html'">
+          ▶ Start New Assessment
+        </button>
+      </div>
+
+      <!-- FEATURE CARDS -->
+      <div class="cards">
+        <div class="card">
+          <div class="card-icon">📊</div>
+          <h3>Multi-Modal Analysis</h3>
+          <p>
+            Advanced AI analyzes your facial expressions, voice patterns, and
+            survey responses
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">📈</div>
+          <h3>Track Progress</h3>
+          <p>
+            Monitor your mental wellness journey with detailed insights and
+            visualizations
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">🕒</div>
+          <h3>View History</h3>
+          <p>Review your past assessments and track improvements over time</p>
+        </div>
+      </div>
+
+      <!-- QUOTE -->
+      <div class="quote">
+        “Taking care of your mental health is an act of courage and self-love.”
+      </div>
+    </main>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        function extractDisplayName(val) {
+          if (!val) return "pramu";
+          // If JSON string, try to parse common fields
+          try {
+            if (typeof val === "string" && val.trim().startsWith("{")) {
+              const obj = JSON.parse(val);
+              val =
+                obj.email ||
+                obj.username ||
+                obj.name ||
+                obj.firstName ||
+                obj.displayName ||
+                val;
+            }
+          } catch (e) {
+            // ignore parse errors
+          }
+          if (typeof val !== "string") return String(val);
+          if (val.includes("@")) {
+            const local = val.split("@")[0];
+            // Show first 5 characters of the email local-part
+            return local.length > 5 ? local.substring(0, 5) : local;
+          }
+          const parts = val.split(/[^A-Za-z0-9]+/);
+          return parts[0] || val;
+        }
+
+        const possibleKeys = [
+          "userEmail",
+          "email",
+          "username",
+          "user",
+          "profile",
+          "userName",
+        ];
+        let found = null;
+        for (const k of possibleKeys) {
+          let v = sessionStorage.getItem(k) || localStorage.getItem(k);
+          if (v) {
+            found = v;
+            break;
+          }
+        }
+
+        const userDisplay = document.getElementById("userDisplay");
+        if (userDisplay) userDisplay.textContent = extractDisplayName(found);
+
+        const signOutBtn = document.getElementById("signOutBtn");
+        if (signOutBtn) {
+          signOutBtn.addEventListener("click", function () {
+            try {
+              sessionStorage.clear();
+            } catch (e) {}
+            try {
+              localStorage.removeItem("authToken");
+              localStorage.removeItem("user");
+              localStorage.removeItem("userEmail");
+            } catch (e) {}
+            window.location.href = "./auth/login.html";
+          });
+          signOutBtn.addEventListener("keypress", function (e) {
+            if (e.key === "Enter" || e.key === " ") signOutBtn.click();
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
