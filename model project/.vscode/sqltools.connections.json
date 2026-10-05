@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "connections": [
+    {
+      "name": "stress_db@localhost",
+      "driver": "MySQL",
+      "server": "localhost",
+      "port": 3306,
+      "database": "stress_db",
+      "username": "stress_user",
+      "password": "StrongPassword123",
+      "ssl": false
+    }
+  ]
+}

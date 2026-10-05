@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🎭 Emotion & Stress Level Predictor</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+
+      .container {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        max-width: 1100px;
+        width: 100%;
+        padding: 40px;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .header h1 {
+        font-size: 2.5em;
+        color: #2c3e50;
+        margin-bottom: 10px;
+      }
+
+      .header p {
+        font-size: 1.1em;
+        color: #7f8c8d;
+      }
+
+      .content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-bottom: 30px;
+      }
+
+      @media (max-width: 768px) {
+        .content {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .section {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .section-title {
+        font-size: 1.3em;
+        font-weight: bold;
+        color: #2c3e50;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #667eea;
+      }
+
+      .upload-area {
+        border: 3px dashed #667eea;
+        border-radius: 10px;
+        padding: 40px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #f8f9ff;
+      }
+
+      .upload-area:hover {
+        border-color: #764ba2;
+        background: #f0f2ff;
+      }
+
+      .upload-area.dragover {
+        border-color: #764ba2;
+        background: #e6e9ff;
+        transform: scale(1.02);
+      }
+
+      .upload-area i {
+        font-size: 3em;
+        color: #667eea;
+        margin-bottom: 10px;
+      }
+
+      .upload-area p {
+        color: #7f8c8d;
+        font-size: 0.95em;
+        margin: 10px 0;
+      }
+
+      #imagePreview {
+        width: 100%;
+        max-height: 400px;
+        border-radius: 10px;
+        margin-top: 15px;
+        display: none;
+        object-fit: contain;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      #imagePreview.show {
+        display: block;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      button {
+        flex: 1;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn-upload {
+        background: #667eea;
+        color: white;
+      }
+
+      .btn-upload:hover {
+        background: #5568d3;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      }
+
+      .btn-predict {
+        background: #4caf50;
+        color: white;
+        font-size: 1.1em;
+      }
+
+      .btn-predict:hover {
+        background: #45a049;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+      }
+
+      .btn-predict:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .results {
+        background: #f8f9ff;
+        border-radius: 10px;
+        padding: 20px;
+        display: none;
+      }
+
+      .results.show {
+        display: block;
+      }
+
+      .result-item {
+        margin-bottom: 20px;
+      }
+
+      .result-label {
+        font-size: 0.9em;
+        color: #7f8c8d;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      .result-value {
+        font-size: 2em;
+        font-weight: bold;
+        padding: 10px;
+        border-radius: 5px;
+        text-align: center;
+        color: white;
+      }
+
+      .emotion-result {
+        background: #667eea;
+      }
+
+      .stress-result {
+        background: #764ba2;
+      }
+
+      .confidence-bar {
+        width: 100%;
+        height: 25px;
+        background: #e0e0e0;
+        border-radius: 5px;
+        overflow: hidden;
+        margin: 10px 0;
+      }
+
+      .confidence-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.9em;
+        font-weight: bold;
+        transition: width 0.5s ease;
+      }
+
+      .probabilities {
+        margin-top: 20px;
+      }
+
+      .probability-item {
+        margin-bottom: 15px;
+      }
+
+      .prob-label {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+        font-size: 0.95em;
+        font-weight: bold;
+        color: #2c3e50;
+      }
+
+      .prob-bar {
+        width: 100%;
+        height: 20px;
+        background: #e0e0e0;
+        border-radius: 3px;
+        overflow: hidden;
+      }
+
+      .prob-fill {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: 5px;
+        color: white;
+        font-size: 0.8em;
+        font-weight: bold;
+        transition: width 0.5s ease;
+      }
+
+      .loading {
+        display: none;
+        text-align: center;
+        padding: 20px;
+      }
+
+      .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 10px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .error-message {
+        background: #ffebee;
+        color: #c62828;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        display: none;
+      }
+
+      .error-message.show {
+        display: block;
+      }
+
+      .success-message {
+        background: #e8f5e9;
+        color: #2e7d32;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        display: none;
+      }
+
+      .success-message.show {
+        display: block;
+      }
+
+      .info-box {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        font-size: 0.95em;
+        color: #856404;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🎭 Emotion & Stress Predictor</h1>
+        <p>
+          Upload an image or take a photo to detect emotions and stress levels
+        </p>
+      </div>
+
+      <div class="info-box">
+        <strong>📝 Emotions detected:</strong> Happy, Neutral, Sad, Fear
+        <br /><strong>⚡ Stress Levels:</strong> Low (Happy) → Medium (Neutral)
+        → High (Sad/Fear)
+      </div>
+
+      <div class="content">
+        <!-- Left Column: Upload -->
+        <div class="section">
+          <div class="section-title">📷 Image Upload</div>
+
+          <div class="error-message" id="errorMessage"></div>
+          <div class="success-message" id="successMessage"></div>
+
+          <div class="upload-area" id="uploadArea">
+            <div>📁 Drag and drop image here</div>
+            <p>or click to select</p>
+            <small>Supported: JPG, PNG, BMP, GIF</small>
+          </div>
+
+          <img id="imagePreview" alt="Preview" />
+
+          <div class="button-group">
+            <button
+              class="btn-upload"
+              onclick="document.getElementById('fileInput').click()"
+            >
+              📁 Choose File
+            </button>
+          </div>
+
+          <input
+            type="file"
+            id="fileInput"
+            accept="image/*"
+            style="display: none"
+          />
+        </div>
+
+        <!-- Right Column: Results -->
+        <div class="section">
+          <div class="section-title">🔮 Prediction Results</div>
+
+          <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Analyzing image...</p>
+          </div>
+
+          <div class="results" id="results">
+            <div class="result-item">
+              <div class="result-label">Detected Emotion</div>
+              <div class="result-value emotion-result" id="emotionResult">
+                --
+              </div>
+            </div>
+
+            <div class="result-item">
+              <div class="result-label">Confidence Level</div>
+              <div class="confidence-bar">
+                <div
+                  class="confidence-fill"
+                  id="confidenceFill"
+                  style="width: 0%"
+                >
+                  <span id="confidenceText">0%</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="result-item">
+              <div class="result-label">Stress Level</div>
+              <div class="result-value stress-result" id="stressResult">--</div>
+            </div>
+
+            <div class="probabilities">
+              <div class="result-label">All Probabilities</div>
+
+              <div class="probability-item">
+                <div class="prob-label">
+                  <span>😊 Happy</span>
+                  <span id="prob-happy">0%</span>
+                </div>
+                <div class="prob-bar">
+                  <div
+                    class="prob-fill"
+                    id="fill-happy"
+                    style="width: 0%; background: #4caf50"
+                  ></div>
+                </div>
+              </div>
+
+              <div class="probability-item">
+                <div class="prob-label">
+                  <span>😐 Neutral</span>
+                  <span id="prob-neutral">0%</span>
+                </div>
+                <div class="prob-bar">
+                  <div
+                    class="prob-fill"
+                    id="fill-neutral"
+                    style="width: 0%; background: #2196f3"
+                  ></div>
+                </div>
+              </div>
+
+              <div class="probability-item">
+                <div class="prob-label">
+                  <span>😢 Sad</span>
+                  <span id="prob-sad">0%</span>
+                </div>
+                <div class="prob-bar">
+                  <div
+                    class="prob-fill"
+                    id="fill-sad"
+                    style="width: 0%; background: #ff9800"
+                  ></div>
+                </div>
+              </div>
+
+              <div class="probability-item">
+                <div class="prob-label">
+                  <span>😨 Fear</span>
+                  <span id="prob-fear">0%</span>
+                </div>
+                <div class="prob-bar">
+                  <div
+                    class="prob-fill"
+                    id="fill-fear"
+                    style="width: 0%; background: #f44336"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button
+            class="btn-predict"
+            id="predictBtn"
+            onclick="predictEmotion()"
+            disabled
+          >
+            🔮 Predict Emotion
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let selectedFile = null;
+
+      // File input handler
+      document
+        .getElementById("fileInput")
+        .addEventListener("change", handleFileSelect);
+
+      // Drag and drop handlers
+      const uploadArea = document.getElementById("uploadArea");
+      uploadArea.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        uploadArea.classList.add("dragover");
+      });
+
+      uploadArea.addEventListener("dragleave", () => {
+        uploadArea.classList.remove("dragover");
+      });
+
+      uploadArea.addEventListener("drop", (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove("dragover");
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          selectedFile = files[0];
+          displayImage(selectedFile);
+        }
+      });
+
+      uploadArea.addEventListener("click", () => {
+        document.getElementById("fileInput").click();
+      });
+
+      function handleFileSelect(e) {
+        const files = e.target.files;
+        if (files.length > 0) {
+          selectedFile = files[0];
+          displayImage(selectedFile);
+        }
+      }
+
+      function displayImage(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = document.getElementById("imagePreview");
+          img.src = e.target.result;
+          img.classList.add("show");
+          document.getElementById("predictBtn").disabled = false;
+          showSuccess(
+            'Image loaded successfully! Click "Predict Emotion" to analyze.'
+          );
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function predictEmotion() {
+        if (!selectedFile) {
+          showError("Please select an image first!");
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("image", selectedFile);
+
+        document.getElementById("loading").style.display = "block";
+        document.getElementById("results").classList.remove("show");
+
+        fetch("/predict", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById("loading").style.display = "none";
+
+            if (data.success) {
+              displayResults(data);
+              document.getElementById("results").classList.add("show");
+              showSuccess(`Prediction complete: ${data.emotion}`);
+            } else {
+              showError(data.error || "Prediction failed");
+            }
+          })
+          .catch((error) => {
+            document.getElementById("loading").style.display = "none";
+            showError("Error: " + error.message);
+          });
+      }
+
+      function displayResults(data) {
+        // Display emotion and stress
+        document.getElementById("emotionResult").textContent = data.emotion;
+        document.getElementById("emotionResult").style.background =
+          data.colors[data.emotion.toLowerCase()];
+
+        document.getElementById("stressResult").textContent = data.stress_level;
+
+        // Display confidence
+        const confidence = data.confidence;
+        document.getElementById("confidenceFill").style.width =
+          confidence + "%";
+        document.getElementById("confidenceText").textContent =
+          confidence.toFixed(1) + "%";
+
+        // Display probabilities
+        const probs = data.probabilities;
+        const emotions = ["happy", "neutral", "sad", "fear"];
+
+        emotions.forEach((emotion) => {
+          const prob = probs[emotion];
+          document.getElementById(`prob-${emotion}`).textContent =
+            prob.toFixed(2) + "%";
+          document.getElementById(`fill-${emotion}`).style.width = prob + "%";
+        });
+      }
+
+      function showError(message) {
+        const errorEl = document.getElementById("errorMessage");
+        errorEl.textContent = message;
+        errorEl.classList.add("show");
+        setTimeout(() => errorEl.classList.remove("show"), 5000);
+      }
+
+      function showSuccess(message) {
+        const successEl = document.getElementById("successMessage");
+        successEl.textContent = message;
+        successEl.classList.add("show");
+        setTimeout(() => successEl.classList.remove("show"), 5000);
+      }
+    </script>
+  </body>
+</html>
